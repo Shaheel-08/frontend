@@ -83,26 +83,28 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
       const formData = new FormData();
       formData.append('image', selectedFile);
 
-      // --- THIS IS THE KEY CHANGE ---
-      // Call your actual Flask backend
-      const response = await fetch('http://localhost:5000/predict', {
+      // ✅ UPDATED: Read the backend URL from the .env file
+      const apiUrl = `${import.meta.env.VITE_API_URL}/predict`;
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get a valid response from the server.');
-      }
-
       const result = await response.json();
+      
+      // Handle custom error messages from the backend
+      if (!response.ok) {
+        throw new Error(result.message || 'An unknown server error occurred.');
+      }
+      
       onAnalysisComplete(result);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: `An error occurred: ${error}`,
+        description: error.message || 'An error occurred during analysis.',
         variant: "destructive",
       });
     } finally {
