@@ -10,7 +10,7 @@ const HeroSection = () => {
     {
       icon: Brain,
       title: 'AI-Powered',
-      description: 'Advanced EfficientNetB0 + Tensorflow technology'
+      description: 'Advanced MobileNetV2 + Tensorflow technology'
     },
     {
       icon: Clock,

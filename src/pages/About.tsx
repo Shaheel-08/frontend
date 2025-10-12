@@ -7,7 +7,7 @@ const About = () => {
     {
       icon: Brain,
       title: 'Advanced AI Technology',
-      description: 'Our system uses EfficientNetB0 architecture combined with Convolutional Neural Networks (CNN) for accurate skin disease classification.'
+      description: 'Our system uses MobileNetV2 architecture combined with Convolutional Neural Networks (CNN) for accurate skin disease classification.'
     },
     {
       icon: Zap,
@@ -27,7 +27,7 @@ const About = () => {
   ];
 
   const technicalSpecs = [
-    { label: 'AI Model', value: 'EfficientNetB0 + CNN' },
+    { label: 'AI Model', value: 'MobileNetV2 + CNN' },
     { label: 'Training Dataset', value: '30,000+ Images' },
     { label: 'Accuracy Rate', value: '92.5%' },
     { label: 'Processing Time', value: '< 3 seconds' },
@@ -118,7 +118,7 @@ const About = () => {
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">AI Analysis</h3>
                 <p className="text-sm text-muted-foreground">
-                  Our EfficientNetB0 + Tensorflow analyzes the image for skin conditions
+                  Our MobileNetV2 + Tensorflow analyzes the image for skin conditions
                 </p>
               </div>
               <div className="text-center">
