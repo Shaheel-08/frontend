@@ -1,32 +1,45 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Upload from "./pages/Upload";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
+// 1. Add this import at the top
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
-const queryClient = new QueryClient();
+import { Toaster } from "@/components/ui/toaster"
+import { useState } from "react"
+import DiagnosisResults from "@/components/DiagnosisResults"
+import ImageUpload from "@/components/ImageUpload"
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  const [result, setResult] = useState(null)
+  const [view, setView] = useState('upload') // 'upload' or 'results'
 
-export default App;
+  const handleAnalysisComplete = (analysisResult: any) => {
+    setResult(analysisResult);
+    setView('results');
+  };
+
+  const handleNewAnalysis = () => {
+    setView('upload');
+    setResult(null);
+  };
+
+  return (
+    <>
+      <div className="flex flex-col min-h-screen bg-background">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8">
+          {view === 'upload' && <ImageUpload onAnalysisComplete={handleAnalysisComplete} />}
+          {view === 'results' && result && (
+            <DiagnosisResults result={result} onNewAnalysis={handleNewAnalysis} />
+          )}
+        </main>
+        <Footer />
+        <Toaster />
+      </div>
+      
+      {/* 2. Add this component here, at the end */}
+      <SpeedInsights />
+    </>
+  )
+}
+
+export default App

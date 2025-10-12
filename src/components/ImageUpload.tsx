@@ -83,7 +83,9 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
       const formData = new FormData();
       formData.append('image', selectedFile);
 
-      // ✅ UPDATED: Read the backend URL from the .env file
+      // ✅ This code correctly reads the backend URL from your .env file
+      // and adds the /predict endpoint. It works for both local testing
+      // and live deployment.
       const apiUrl = `${import.meta.env.VITE_API_URL}/predict`;
 
       const response = await fetch(apiUrl, {
@@ -93,7 +95,7 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
 
       const result = await response.json();
       
-      // Handle custom error messages from the backend
+      // This handles custom error messages from your backend
       if (!response.ok) {
         throw new Error(result.message || 'An unknown server error occurred.');
       }
