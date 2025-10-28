@@ -48,7 +48,7 @@ const DiagnosisResults = ({ result, onNewAnalysis }: ResultsProps) => {
 
     try {
       // Get the backend URL from the .env file and add the secure endpoint
-      const apiUrl = `${import.meta.env.VITE_API_URL}/share-telegram`;
+      const apiUrl = `https://ramji2311-skin-diseases.hf.space/share-telegram`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
