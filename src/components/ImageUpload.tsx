@@ -86,7 +86,7 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
       // ✅ This code correctly reads the backend URL from your .env file
       // and adds the /predict endpoint. It works for both local testing
       // and live deployment.
-      const apiUrl = `${import.meta.env.VITE_API_URL}/predict`;
+      const apiUrl = `https://huggingface.co/spaces/Ramji2311/Skin-diseases/predict`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
