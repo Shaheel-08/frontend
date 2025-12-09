@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { AlertTriangle, CheckCircle, FileText, Stethoscope, Share } from 'lucide-react';
+import { AlertTriangle, CheckCircle, FileText, Stethoscope, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface DiagnosisResult {
   disease: string;
@@ -20,9 +22,6 @@ interface ResultsProps {
 const DiagnosisResults = ({ result, onNewAnalysis }: ResultsProps) => {
   const { disease, confidence, treatment, critical, recommendations } = result;
   const confidencePercentage = Math.round(confidence * 100);
-
-  const [isSending, setIsSending] = useState(false);
-  const [sendStatus, setSendStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   // Logic to determine if a condition is critical
   const criticalDiseases = ['cancer', 'malignant', 'melanoma', 'carcinoma', 'herpes', 'cellulitis', 'lupus', 'systemic', 'vasculitis'];
@@ -42,36 +41,77 @@ const DiagnosisResults = ({ result, onNewAnalysis }: ResultsProps) => {
     return 'Low Confidence';
   };
 
-  const handleShareToTelegram = async () => {
-    setIsSending(true);
-    setSendStatus('idle');
-
-    try {
-      // Get the backend URL from the .env file and add the secure endpoint
-      const apiUrl = `https://ramji2311-skin-diseases.hf.space/share-telegram`;
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          disease: disease,
-          confidence: confidencePercentage,
-          treatment: treatment,
-        }),
-      });
-
-      if (response.ok) {
-        setSendStatus('success');
-      } else {
-        throw new Error('Server failed to send the message.');
-      }
-    } catch (error) {
-      setSendStatus('error');
-      console.error('Share to Telegram error:', error);
-      alert('An error occurred while trying to share the results.');
-    } finally {
-      setIsSending(false);
-    }
+  const handleDownloadReport = async () => {
+    // Create a temporary div with the report content
+    const reportDiv = document.createElement('div');
+    reportDiv.style.padding = '40px';
+    reportDiv.style.width = '800px';
+    reportDiv.style.backgroundColor = 'white';
+    reportDiv.style.fontFamily = 'Arial, sans-serif';
+    
+    reportDiv.innerHTML = `
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">
+          AI Skin Disease Diagnosis Report
+        </h1>
+        <p style="font-size: 12px; color: #666;">
+          Generated on: ${new Date().toLocaleString()}
+        </p>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Diagnosis:</h2>
+        <p style="font-size: 14px;">${disease}</p>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Confidence Score:</h2>
+        <p style="font-size: 14px;">${confidencePercentage}% - ${getConfidenceLabel(confidencePercentage)}</p>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Treatment Information:</h2>
+        <p style="font-size: 12px; line-height: 1.6;">${treatment}</p>
+      </div>
+      
+      ${recommendations && recommendations.length > 0 ? `
+        <div style="margin-bottom: 20px;">
+          <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Recommendations:</h2>
+          <ul style="font-size: 12px; line-height: 1.8; padding-left: 20px;">
+            ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+      
+      <div style="margin-top: 40px; padding: 15px; background-color: #f5f5f5; border-radius: 8px;">
+        <p style="font-size: 10px; color: #666; font-style: italic;">
+          <strong>DISCLAIMER:</strong> This AI analysis is for informational purposes only and should not replace 
+          professional medical consultation. Always consult a healthcare professional for accurate diagnosis and treatment.
+        </p>
+      </div>
+    `;
+    
+    // Temporarily add to DOM
+    document.body.appendChild(reportDiv);
+    
+    // Convert to canvas
+    const canvas = await html2canvas(reportDiv, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
+    
+    // Remove from DOM
+    document.body.removeChild(reportDiv);
+    
+    // Convert canvas to PDF
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    pdf.save(`skin-diagnosis-report-${new Date().getTime()}.pdf`);
   };
 
   return (
@@ -124,11 +164,10 @@ const DiagnosisResults = ({ result, onNewAnalysis }: ResultsProps) => {
                 variant="outline"
                 size="sm"
                 className="flex-1"
-                onClick={handleShareToTelegram}
-                disabled={isSending}
+                onClick={handleDownloadReport}
               >
-                <Share className="h-4 w-4 mr-2" />
-                {isSending ? 'Sending...' : (sendStatus === 'success' ? 'Sent!' : 'Share to Telegram')}
+                <Download className="h-4 w-4 mr-2" />
+                Download Report (PDF)
               </Button>
             </div>
           </CardContent>

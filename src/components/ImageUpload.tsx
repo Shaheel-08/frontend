@@ -83,10 +83,8 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
       const formData = new FormData();
       formData.append('image', selectedFile);
 
-      // ✅ This code correctly reads the backend URL from your .env file
-      // and adds the /predict endpoint. It works for both local testing
-      // and live deployment.
-      const apiUrl = `https://ramji2311-skin-diseases.hf.space/predict`;
+      
+      const apiUrl = `https://shaheel-08-skin-disease-backend.hf.space/predict`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
