@@ -81,7 +81,7 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
     
     try {
       const formData = new FormData();
-      formData.append('image', selectedFile);
+      formData.append('file', selectedFile);
 
       
       const apiUrl = `https://shaheel-08-skin-disease-backend.hf.space/predict`;
@@ -91,12 +91,9 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
         body: formData,
       });
 
-      const result = await response.json();
+      if (!response.ok) throw new Error("API Request Failed");
       
-      // This handles custom error messages from your backend
-      if (!response.ok) {
-        throw new Error(result.message || 'An unknown server error occurred.');
-      }
+      const result = await response.json();
       
       onAnalysisComplete(result);
 
