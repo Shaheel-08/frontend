@@ -93,9 +93,29 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
 
       if (!response.ok) throw new Error("API Request Failed");
       
-      const result = await response.json();
+      const data = await response.json();
       
-      onAnalysisComplete(result);
+      if (data.status === "blurry") {
+        toast({
+          title: "Image Quality Issue",
+          description: data.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data.status === "uncertain" || data.status === "success") {
+        onAnalysisComplete({
+          disease: data.disease,
+          confidence: data.confidence,
+          treatment: data.treatment,
+          critical: data.critical,
+          recommendations: data.recommendations,
+        });
+      } else {
+        onAnalysisComplete(data);
+      }
+
 
     } catch (error: any) {
       console.error('Analysis error:', error);
