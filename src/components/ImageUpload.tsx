@@ -84,7 +84,7 @@ const ImageUpload = ({ onAnalysisComplete }: UploadProps) => {
       formData.append('image', selectedFile);
 
       
-      const apiUrl = `https://shaheel-08-skin-disease-backend.hf.space/predict`;
+      const apiUrl = `https://shaheel-08-skin-disease-backend.hf.space`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
